@@ -1,0 +1,86 @@
+// Kalkulation leicht verständlich, weniger kompliziert
+
+
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // Configura los pines para la pantalla LCD
+
+int val1 = 0;
+int val2 = 0;
+char operador = ' ';
+boolean operadorIngresado = false;
+
+void setup() {
+  lcd.begin(16, 2); // Inicializa la pantalla LCD (16 columnas x 2 filas)
+  lcd.setCursor(0, 0);
+  lcd.print("Calculadora Arduino");
+  lcd.setCursor(0, 1);
+  lcd.print("Ingrese operacion");
+}
+
+void loop() {
+  char key = leeTecla();
+  
+  if (key != NO_KEY) {
+    if (isdigit(key)) {
+      if (!operadorIngresado) {
+        val1 = val1 * 10 + (key - '0');
+      } else {
+        val2 = val2 * 10 + (key - '0');
+      }
+      lcd.print(key);
+    } else if (key == '+' || key == '-' || key == '*' || key == '/') {
+      operador = key;
+      operadorIngresado = true;
+      lcd.print(key);
+    } else if (key == '=') {
+      if (operadorIngresado) {
+        float resultado = calcularResultado();
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Resultado:");
+        lcd.setCursor(0, 1);
+        lcd.print(resultado);
+        delay(2000);
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("Ingrese operacion");
+        operador = ' ';
+        operadorIngresado = false;
+        val1 = val2 = 0;
+      }
+    } else if (key == 'C') {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Borrando...");
+      delay(1000);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print("Ingrese operacion");
+      operador = ' ';
+      operadorIngresado = false;
+      val1 = val2 = 0;
+    }
+  }
+}
+
+char leeTecla() {
+  // Leer el teclado de membrana y devolver la tecla presionada
+}
+
+float calcularResultado() {
+  if (operador == '+') {
+    return val1 + val2;
+  } else if (operador == '-') {
+    return val1 - val2;
+  } else if (operador == '*') {
+    return val1 * val2;
+  } else if (operador == '/') {
+    if (val2 != 0) {
+      return (float)val1 / val2;
+    } else {
+      return 0; // Evitar la división por cero
+    }
+  }
+  return 0;
+}
